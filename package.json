@@ -1,0 +1,22 @@
+{
+  "name": "x-post-to-json",
+  "version": "1.0.0",
+  "description": "Turn any X (Twitter) post into JSON, PDF, PNG card, Markdown, or a Slack/Discord post — no API key, no login. Includes an MCP server.",
+  "type": "module",
+  "license": "MIT",
+  "author": "itsbigdill",
+  "homepage": "https://github.com/itsbigdill/x-post-to-json",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/itsbigdill/x-post-to-json.git"
+  },
+  "keywords": ["twitter", "x", "tweet", "json", "pdf", "png", "markdown", "mcp", "scraper", "syndication"],
+  "engines": { "node": ">=18" },
+  "bin": {
+    "tweet-to-json": "scripts/fetch-tweet.mjs",
+    "tweet-to-pdf": "scripts/tweet-to-pdf.mjs",
+    "tweet-to-png": "scripts/tweet-to-png.mjs",
+    "tweet-to-md": "scripts/tweet-to-md.mjs",
+    "tweet-to-chat": "scripts/tweet-to-chat.mjs"
+  }
+}
