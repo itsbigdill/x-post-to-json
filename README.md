@@ -2,6 +2,10 @@
 
 Turn any **X (Twitter) post** into **JSON**, a **PDF document**, a **PNG card**, **Markdown**, or a **Slack/Discord post** — with **no API key and no login**.
 
+<p align="center">
+  <img src="docs/example-card.png" width="540" alt="A tweet rendered as a PNG card">
+</p>
+
 Zero npm dependencies. Works on Node 18+ (uses built-in `fetch`). PDF/PNG rendering uses your local headless Google Chrome.
 
 ```bash
@@ -22,6 +26,7 @@ X degrades its own content outside the platform (login walls, broken previews, d
 | **Markdown** | `scripts/tweet-to-md.mjs <url>` | for Notion/Obsidian/blogs; batch → joined |
 | **Slack/Discord** | `scripts/tweet-to-chat.mjs <url> --webhook <url>` | rich card via incoming webhook; `--dry-run` to preview |
 | **Analyze / fact-check** | `scripts/analyze-tweet.mjs <url>` | returns a fact-check *scaffold* (signals, claims, search queries, rubric) for an AI to verify against |
+| **Unroll thread** | `scripts/unroll-thread.mjs <url> [--markdown]` | walks back the reply chain → the author's full ordered thread |
 
 All accept a tweet URL (`x.com` / `twitter.com`, with `?query`/`/photo/1`) or a bare tweet ID, and one or more inputs (batch).
 
@@ -50,7 +55,7 @@ claude mcp add x-post -- node "$(pwd)/mcp-server.mjs"
 } }
 ```
 
-Tools: `tweet_to_json`, `analyze_tweet`, `tweet_to_markdown`, `tweet_to_png_card`, `tweet_to_pdf`, `post_tweet_to_chat`.
+Tools: `tweet_to_json`, `analyze_tweet`, `unroll_thread`, `tweet_to_markdown`, `tweet_to_png_card`, `tweet_to_pdf`, `post_tweet_to_chat`.
 
 ### `analyze_tweet` — fact-check / explain
 
@@ -67,6 +72,7 @@ scripts/tweet-to-png.mjs   PNG card
 scripts/tweet-to-md.mjs    Markdown
 scripts/tweet-to-chat.mjs  Slack/Discord
 scripts/analyze-tweet.mjs  fact-check scaffold
+scripts/unroll-thread.mjs  thread unroll (backward walk)
 mcp-server.mjs             MCP wrapper
 ```
 

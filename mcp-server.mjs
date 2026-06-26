@@ -67,6 +67,19 @@ const TOOLS = [
     },
   },
   {
+    name: "unroll_thread",
+    description:
+      "Unroll an X thread into the author's full ordered chain of tweets. Pass the LAST tweet of the thread (or any tweet in it) — it walks backward collecting consecutive same-author tweets and returns them root-first. Passing the first tweet returns just that one (forward expansion needs login). format: 'json' (default) or 'markdown'.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        url: { type: "string", description: "Tweet URL or ID (ideally the last tweet of the thread)" },
+        format: { type: "string", enum: ["json", "markdown"], description: "Output format (default json)" },
+      },
+      required: ["url"],
+    },
+  },
+  {
     name: "tweet_to_markdown",
     description: "Fetch an X post and return portable Markdown (blockquote) for Notion/Obsidian/blogs — linkified text, media links, metrics, source link.",
     inputSchema: {
@@ -124,6 +137,11 @@ async function callTool(name, a = {}) {
     }
     case "analyze_tweet":
       return textResult(await script("analyze-tweet.mjs", [a.url]));
+    case "unroll_thread": {
+      const args = [a.url];
+      if (a.format === "markdown") args.push("--markdown");
+      return textResult(await script("unroll-thread.mjs", args));
+    }
     case "tweet_to_markdown":
       return textResult(await script("tweet-to-md.mjs", [a.url]));
     case "tweet_to_png_card": {

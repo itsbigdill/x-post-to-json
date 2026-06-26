@@ -53,23 +53,35 @@ function claimCandidates(text) {
   ).filter((s) => s.length > 25);
 }
 
-function buildQueries(text, ents) {
-  const core = text
+const STOP = new Set(
+  "a an the of to in on for and or but with without from by as at is are was were be been being this that these those it its their his her your you we they he she has have had do does did not no will would can could should may might must major more most than have been according found using used involving about into over under per them then there here just also new study studies".split(" ")
+);
+
+// Salient keywords: content words, minus stopwords and the sensational/causal
+// noise we already flagged, ranked by length (a cheap specificity proxy).
+function keywords(text, exclude, n = 6) {
+  const ex = new Set(exclude.map((w) => w.toLowerCase()));
+  const words = text
+    .toLowerCase()
     .replace(/https?:\/\/\S+/g, "")
     .replace(/[#@]\w+/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .split(" ")
-    .slice(0, 12)
-    .join(" ");
-  const q = [`${core} fact check`, `${core} debunked OR misleading`];
-  if (ents.length) {
-    q.push(`${ents[0]} study findings`);
-    q.push(`${ents[0]} scientific consensus`);
-  } else {
-    q.push(`${core} scientific consensus`);
-  }
-  return uniq(q);
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 3 && !STOP.has(w) && !ex.has(w));
+  return [...new Set(words)].sort((a, b) => b.length - a.length).slice(0, n);
+}
+
+function buildQueries(text, ents, noise, observational) {
+  const kw = keywords(text, noise);
+  const core = kw.slice(0, 5).join(" ");
+  const anchor = ents[0] ? `${ents[0]} ` : "";
+  const q = [
+    `${anchor}${kw.slice(0, 4).join(" ")} study`.trim(),
+    `${anchor}${core} fact check`.trim(),
+  ];
+  if (observational) q.push(`${core} reverse causation confounding`.trim());
+  q.push(`${ents[0] || kw.slice(0, 4).join(" ")} scientific consensus expert`.trim());
+  return uniq(q).filter((s) => s.replace(/\s+/g, "").length > 4);
 }
 
 const RUBRIC = `You are fact-checking the tweet above. Do NOT trust the tweet's framing.
@@ -127,7 +139,12 @@ try {
     signals,
     checkable,
     claim_candidates: claimCandidates(text),
-    suggested_queries: buildQueries(text, ents),
+    suggested_queries: buildQueries(
+      text,
+      ents,
+      [...signals.sensational_language, ...signals.causal_language, ...signals.absolutes],
+      signals.causal_language.length > 0 && signals.statistic_terms.length > 0
+    ),
     credibility: {
       verified_type: t.author?.verified_type,
       note:

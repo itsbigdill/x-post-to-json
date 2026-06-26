@@ -102,14 +102,27 @@ This is designed for the MCP `analyze_tweet` tool: the host AI calls it, then
 web-searches and produces a verdict card (claim → supported/misleading/false/
 unverifiable, mechanism of error, evidence, source reliability).
 
+## 7. Unroll a thread
+
+```bash
+node .claude/skills/x-post-to-json/scripts/unroll-thread.mjs "<url-or-id>" [--markdown | --ids]
+```
+
+Walks **backward** from the given tweet via `in_reply_to`, collecting consecutive
+tweets by the same author, and returns the ordered chain (root first). Pass the
+**last** tweet of the thread (or any tweet) — forward expansion from the first
+tweet isn't possible without login. Output: JSON (default), `--markdown`, or
+`--ids` (newline-separated, pipe into the other tools).
+
 ## MCP server (use the tools from any AI client)
 
 `mcp-server.mjs` exposes all of the above as MCP tools so any MCP client (Claude
 Desktop, Claude Code, Cursor, Cline, …) can call them directly — no `node ...`.
 Zero dependencies (JSON-RPC over stdio).
 
-Tools: `tweet_to_json`, `analyze_tweet` (fact-check scaffold), `tweet_to_markdown`,
-`tweet_to_png_card` (returns the image inline), `tweet_to_pdf`, `post_tweet_to_chat`.
+Tools: `tweet_to_json`, `analyze_tweet` (fact-check scaffold), `unroll_thread`,
+`tweet_to_markdown`, `tweet_to_png_card` (returns the image inline), `tweet_to_pdf`,
+`post_tweet_to_chat`.
 
 Register in Claude Code:
 ```bash
