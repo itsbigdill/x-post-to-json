@@ -87,14 +87,29 @@ or Slack (api.slack.com → Incoming Webhooks), then pass its URL.
 
 ---
 
+## 6. Analyze / fact-check a tweet
+
+```bash
+node .claude/skills/x-post-to-json/scripts/analyze-tweet.mjs "<url-or-id>"
+```
+
+Returns a **fact-check scaffold** (not a verdict — no LLM here): the tweet plus
+heuristic signals (percentages, stats/causal/sensational language, numbers,
+links, named entities), candidate claims, suggested web-search queries, author
+credibility, and a rubric. An AI then runs the searches and writes the verdict.
+
+This is designed for the MCP `analyze_tweet` tool: the host AI calls it, then
+web-searches and produces a verdict card (claim → supported/misleading/false/
+unverifiable, mechanism of error, evidence, source reliability).
+
 ## MCP server (use the tools from any AI client)
 
 `mcp-server.mjs` exposes all of the above as MCP tools so any MCP client (Claude
 Desktop, Claude Code, Cursor, Cline, …) can call them directly — no `node ...`.
 Zero dependencies (JSON-RPC over stdio).
 
-Tools: `tweet_to_json`, `tweet_to_markdown`, `tweet_to_png_card` (returns the
-image inline), `tweet_to_pdf`, `post_tweet_to_chat`.
+Tools: `tweet_to_json`, `analyze_tweet` (fact-check scaffold), `tweet_to_markdown`,
+`tweet_to_png_card` (returns the image inline), `tweet_to_pdf`, `post_tweet_to_chat`.
 
 Register in Claude Code:
 ```bash

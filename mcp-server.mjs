@@ -57,6 +57,16 @@ const TOOLS = [
     },
   },
   {
+    name: "analyze_tweet",
+    description:
+      "Fact-check / explain an X post. Returns a SCAFFOLD: the tweet, heuristic signals (stats, causal & sensational language, numbers, links, named entities), candidate claims, suggested web-search queries, author credibility, and a rubric. After calling this you MUST run web searches (start from suggested_queries, plus your own), prefer primary/peer-reviewed sources, watch for reverse-causation/confounding/cherry-picking, then output the verdict card described in the returned 'instructions'. Use whenever the user wants a tweet verified, debunked, explained, or researched.",
+    inputSchema: {
+      type: "object",
+      properties: { url: { type: "string", description: "Tweet URL or ID" } },
+      required: ["url"],
+    },
+  },
+  {
     name: "tweet_to_markdown",
     description: "Fetch an X post and return portable Markdown (blockquote) for Notion/Obsidian/blogs — linkified text, media links, metrics, source link.",
     inputSchema: {
@@ -112,6 +122,8 @@ async function callTool(name, a = {}) {
       if (a.raw) args.push("--raw-only");
       return textResult(await script("fetch-tweet.mjs", args));
     }
+    case "analyze_tweet":
+      return textResult(await script("analyze-tweet.mjs", [a.url]));
     case "tweet_to_markdown":
       return textResult(await script("tweet-to-md.mjs", [a.url]));
     case "tweet_to_png_card": {

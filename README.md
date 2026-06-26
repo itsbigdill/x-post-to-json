@@ -21,6 +21,7 @@ X degrades its own content outside the platform (login walls, broken previews, d
 | **PNG card** | `scripts/tweet-to-png.mjs <url> -o out.png` | shareable card, 2× retina, transparent bg |
 | **Markdown** | `scripts/tweet-to-md.mjs <url>` | for Notion/Obsidian/blogs; batch → joined |
 | **Slack/Discord** | `scripts/tweet-to-chat.mjs <url> --webhook <url>` | rich card via incoming webhook; `--dry-run` to preview |
+| **Analyze / fact-check** | `scripts/analyze-tweet.mjs <url>` | returns a fact-check *scaffold* (signals, claims, search queries, rubric) for an AI to verify against |
 
 All accept a tweet URL (`x.com` / `twitter.com`, with `?query`/`/photo/1`) or a bare tweet ID, and one or more inputs (batch).
 
@@ -49,7 +50,11 @@ claude mcp add x-post -- node "$(pwd)/mcp-server.mjs"
 } }
 ```
 
-Tools: `tweet_to_json`, `tweet_to_markdown`, `tweet_to_png_card`, `tweet_to_pdf`, `post_tweet_to_chat`.
+Tools: `tweet_to_json`, `analyze_tweet`, `tweet_to_markdown`, `tweet_to_png_card`, `tweet_to_pdf`, `post_tweet_to_chat`.
+
+### `analyze_tweet` — fact-check / explain
+
+Turns the extractor into an analyst. The tool fetches the tweet and returns a **scaffold** — heuristic signals (percentages, stats/causal/sensational language, named entities, links), candidate claims, suggested search queries, author credibility, and a rubric. The host AI then runs web searches and produces a verdict card (claim → supported / misleading / false / unverifiable, the mechanism of any error, the actual evidence, and source reliability). No LLM or API key lives in this repo — the reasoning is done by whatever AI calls the tool.
 
 ## Architecture
 
@@ -61,6 +66,7 @@ scripts/tweet-to-pdf.mjs   PDF document
 scripts/tweet-to-png.mjs   PNG card
 scripts/tweet-to-md.mjs    Markdown
 scripts/tweet-to-chat.mjs  Slack/Discord
+scripts/analyze-tweet.mjs  fact-check scaffold
 mcp-server.mjs             MCP wrapper
 ```
 
